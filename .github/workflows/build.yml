@@ -22,6 +22,9 @@ jobs:
           sudo chown $(whoami) $THEOS
           git clone --depth 1 https://github.com/theos/theos.git $THEOS --quiet
           
+          # Install build deps
+          brew install dpkg ldid 2>/dev/null || true
+          
           # Download patched SDKs (contains private framework tbds)
           echo "Downloading SDKs..."
           curl -sLo /tmp/sdks-master.zip "https://codeload.github.com/theos/sdks/zip/refs/heads/master"
