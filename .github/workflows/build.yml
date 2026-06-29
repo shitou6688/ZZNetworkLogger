@@ -19,6 +19,7 @@ jobs:
           echo "THEOS=/opt/theos" >> $GITHUB_ENV
           sudo mkdir -p $THEOS && sudo chown $(whoami) $THEOS
           git clone --depth 1 https://github.com/theos/theos.git $THEOS --quiet
+          cd $THEOS && git submodule update --init --recursive --depth 1 2>/dev/null || ./bin/update-theos 2>/dev/null || true
           curl -sLo /tmp/sdks.zip "https://codeload.github.com/theos/sdks/zip/refs/heads/master"
           unzip -qo /tmp/sdks.zip -d /tmp/s
           mkdir -p $THEOS/sdks
