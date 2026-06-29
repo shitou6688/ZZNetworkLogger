@@ -1,0 +1,51 @@
+name: Build ZZNetworkLogger
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Theos
+        run: |
+          export THEOS=/opt/theos
+          echo "THEOS=/opt/theos" >> $GITHUB_ENV
+          sudo mkdir -p $THEOS
+          sudo chown $(whoami) $THEOS
+          git clone --depth 1 https://github.com/theos/theos.git $THEOS --quiet
+          
+          # Download SDK
+          mkdir -p $THEOS/sdks
+          curl -sLo /tmp/sdk.zip "https://github.com/theos/sdks/raw/master/iPhoneOS16.5.sdk.zip"
+          unzip -qo /tmp/sdk.zip -d $THEOS/sdks/
+      
+      - name: Build
+        run: |
+          export THEOS=/opt/theos
+          export PATH=$THEOS/bin:$PATH
+          make clean
+          make package FINALPACKAGE=1
+      
+      - name: List packages
+        run: ls -la packages/
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZZNetworkLogger
+          path: packages/*.deb
+      
+      - name: Upload to Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: packages/*.deb
+          generate_release_notes: true
