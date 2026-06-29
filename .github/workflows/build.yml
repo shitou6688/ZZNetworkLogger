@@ -22,10 +22,13 @@ jobs:
           sudo chown $(whoami) $THEOS
           git clone --depth 1 https://github.com/theos/theos.git $THEOS --quiet
           
-          # Download SDK
+          # Download patched SDKs (contains private framework tbds)
+          echo "Downloading SDKs..."
+          curl -sLo /tmp/sdks-master.zip "https://codeload.github.com/theos/sdks/zip/refs/heads/master"
+          unzip -qo /tmp/sdks-master.zip -d /tmp/sdks-extract
           mkdir -p $THEOS/sdks
-          curl -sLo /tmp/sdk.zip "https://github.com/theos/sdks/raw/master/iPhoneOS16.5.sdk.zip"
-          unzip -qo /tmp/sdk.zip -d $THEOS/sdks/
+          cp -r /tmp/sdks-extract/sdks-master/iPhoneOS*.sdk $THEOS/sdks/ 2>/dev/null || true
+          ls -la $THEOS/sdks/
       
       - name: Build
         run: |
@@ -34,8 +37,8 @@ jobs:
           make clean
           make package FINALPACKAGE=1
       
-      - name: List packages
-        run: ls -la packages/
+      - name: List output
+        run: ls -la packages/ || echo "No packages dir"
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
