@@ -1,0 +1,9 @@
+Package: com.jumo8.zznetworklogger
+Name: ZZNetworkLogger
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: 转转网络请求拦截器 - 自动捕获Cookie并上传到服务器查询iOS版本
+Maintainer: jumo8
+Author: jumo8
+Section: Tweaks
+Depends: mobilesubstrate
