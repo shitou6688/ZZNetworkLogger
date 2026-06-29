@@ -9,7 +9,7 @@ include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = ZZNetworkLogger
 
-ZZNetworkLogger_FILES = Tweak.x
+ZZNetworkLogger_FILES = Tweak.m
 ZZNetworkLogger_CFLAGS = -fobjc-arc
 ZZNetworkLogger_LDFLAGS = -lsqlite3
 ZZNetworkLogger_FRAMEWORKS = UIKit Foundation CFNetwork
