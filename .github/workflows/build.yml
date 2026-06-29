@@ -33,18 +33,20 @@ jobs:
           export THEOS=/opt/theos
           export PATH=$THEOS/bin:$PATH
           make clean
-          # 如果 ldid 没有安装，设置 THEOS 跳过签名
-          if ! which ldid > /dev/null 2>&1; then
-            echo "ldid not found, building unsigned"
-            export CODESIGN_ALLOCATE=false
-          fi
-          make all 2>&1 || true
+          # 先编译（会尝试签名但可能失败，不怕）
+          make all CODESIGN_ALLOCATE=false 2>&1 || true
       
       - name: Collect output
         run: |
           mkdir -p artifacts
-          # 找到所有 .dylib 文件
-          find .theos -name "*.dylib" -type f -exec cp {} artifacts/ \;
+          # 优先取未签名的 dylib（给 TrollFools 自己签）
+          find .theos -name "*.dylib.*.unsigned" -type f | while read f; do
+            cp "$f" "artifacts/ZZNetworkLogger.dylib"
+          done
+          # 如果没有 .unsigned，取任意 dylib
+          if [ ! -f artifacts/ZZNetworkLogger.dylib ]; then
+            find .theos -name "*.dylib" -not -name "*.unsigned" -type f -exec cp {} artifacts/ZZNetworkLogger.dylib \;
+          fi
           ls -la artifacts/
           echo "output_dir=$(pwd)/artifacts" >> $GITHUB_ENV
       
